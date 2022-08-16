@@ -5,27 +5,30 @@ import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './config';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import * as firebase from 'firebase/app';
-import * as auth from 'firebase/auth';
-import * as firestore from 'firebase/firestore';
-import * as storage from 'firebase/storage';
-import * as analytics from 'firebase/analytics';
-import * as functions from 'firebase/functions';
+import { addDoc, collection, connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import { connectStorageEmulator, getStorage } from 'firebase/storage';
+import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 
-initializeApp(firebaseConfig);
+var app = initializeApp(firebaseConfig);
+var db = getFirestore(app);
+var auth = getAuth(app);
+var store = getStorage(app);
+var func = getFunctions(app);
 
+//Add a sample data into testabc collection
+var col = collection(db, 'testabc');
 
-const storageApp = storage.getStorage(firebase.getApp());
-const authApp = auth.getAuth(firebase.getApp());
-const firestoreApp = firestore.getFirestore(firebase.getApp());
-const functionsApp = functions.getFunctions(firebase.getApp());
+addDoc(col, {name:'test'});
 
 // eslint-disable-next-line no-restricted-globals
 if (location.hostname === 'locahost') { 
-  firestore.connectFirestoreEmulator(firestoreApp, 'localhost', 8080);
-  auth.connectAuthEmulator(authApp, 'localhost:8040');
-  storage.connectStorageEmulator(storageApp, 'localhost', 8080);
-  functions.connectFunctionsEmulator(functionsApp,'localhost', 8080);
+  connectFirestoreEmulator(db, 'localhost', 8080);
+  connectAuthEmulator(auth, 'localhost:8040');
+  connectStorageEmulator(store, 'localhost', 8081);
+  connectFunctionsEmulator(func,'localhost', 8082);
 }
+
 
 export interface IApplicationProps { };
 
